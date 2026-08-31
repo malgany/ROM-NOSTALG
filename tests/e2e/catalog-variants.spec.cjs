@@ -15,16 +15,17 @@ function fixture() {
     ['world', 'Super Mario World', 'original'],
     ['world', 'Super Mario World', 'pt-BR'],
     ['world-hack', 'Super Mario World Hack 2025', 'pt-BR'],
-    ['kirby', 'Kirby Super Star', 'original'],
+    ['kirby', 'Kirby Super Star', 'original', 'Example (Japan) [En by Example Team].zip'],
     ['chrono', 'Chrono Trigger', 'pt-BR'],
-  ].map(([groupId, displayTitle, variant], index) => {
+    ['japanese', 'Japanese Example', 'original', 'Example_(J).smc'],
+  ].map(([groupId, displayTitle, variant, fileName], index) => {
     const id = (index + 1).toString(16).padStart(24, '0');
     const bytes = Buffer.from(`${groupId}:${variant}`);
     const { iv, sealed } = seal(bytes);
     const asset = `assets/${id}.bin`;
     assets.set(asset, Buffer.concat([iv, sealed]));
     return { id, title: `${displayTitle}${variant === 'pt-BR' ? ' (PT-BR)' : ''}`,
-      fileName: `${id}.smc`, asset, size: bytes.length,
+      fileName: fileName || `${id}.smc`, asset, size: bytes.length,
       sha256: createHash('sha256').update(bytes).digest('hex'), groupId, displayTitle, variant };
   });
   const { iv, sealed } = seal(Buffer.from(JSON.stringify({ version: 2, system: 'snes', games })));
@@ -55,14 +56,21 @@ for (const viewport of [{ width: 1100, height: 800 }, { width: 390, height: 844 
     await page.locator('#catalog-password').fill(password);
     await page.locator('#unlock-submit').click();
     await expect(page.locator('#catalog-dialog')).toBeVisible();
-    await expect(page.locator('.catalog-game')).toHaveCount(4);
+    await expect(page.locator('.catalog-game')).toHaveCount(5);
     const world = page.getByRole('radio', { name: 'Super Mario World, Original e Traduzido em português', exact: true });
     const original = page.locator('input[name="catalog-variant"][value="original"]');
     const translated = page.locator('input[name="catalog-variant"][value="pt-BR"]');
     const play = page.locator('#play-catalog-game');
     await world.click();
     await expect(world.locator('.version-original')).toHaveCount(1);
+    await expect(world.locator('.version-original')).toHaveClass(/version-usa/);
+    await expect(world.locator('.version-original')).toHaveText('');
+    await expect(world.locator('.version-original')).toHaveAttribute('title', 'Original');
     await expect(world.locator('.version-brazil')).toHaveCount(1);
+    await expect(page.getByRole('radio', { name: 'Japanese Example, Original', exact: true })
+      .locator('.version-original')).toHaveClass(/version-japan/);
+    await expect(page.getByRole('radio', { name: 'Kirby Super Star, Original', exact: true })
+      .locator('.version-original')).toHaveClass(/version-usa/);
     await expect(translated).toBeChecked();
     await expect(play).toHaveClass(/is-translated/);
     const toggleBounds = await page.locator('.catalog-variant-toggle').boundingBox();

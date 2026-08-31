@@ -1003,10 +1003,11 @@ function renderCatalog() {
       for (const [variant, label] of [["original", "Original"], ["pt-BR", "Traduzido em português"]]) {
         if (!game.variants[variant]) continue;
         const badge = document.createElement("span");
-        badge.className = variant === "original" ? "version-original" : "version-brazil";
+        badge.className = variant === "original"
+          ? `version-original version-${window.RomCatalogModel.originalFlag(game.variants[variant])}`
+          : "version-brazil";
         badge.title = label;
         badge.setAttribute("aria-hidden", "true");
-        if (variant === "original") badge.textContent = "®";
         badges.append(badge);
         available.push(label);
       }

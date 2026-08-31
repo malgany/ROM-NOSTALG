@@ -732,18 +732,51 @@ button:focus-visible,
   align-items: center;
 }
 
-.version-original {
-  color: #ded9e9;
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
+.version-original,
 .version-brazil {
   position: relative;
   display: inline-block;
+  flex-shrink: 0;
   width: 22px;
   height: 15px;
+  overflow: hidden;
   border-radius: 2px;
+}
+
+.version-usa {
+  background: repeating-linear-gradient(to bottom, #bf3443 0 calc(100% / 13), #fff calc(100% / 13) calc(200% / 13));
+}
+
+.version-usa::before {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 10px;
+  height: 8px;
+  background: radial-gradient(circle, #fff 0 0.6px, transparent 0.8px) 0 0 / 3px 3px, #274479;
+  content: "";
+}
+
+.version-japan {
+  background: radial-gradient(circle at center, #bc002d 0 4px, #fff 4.3px);
+}
+
+.version-france {
+  background: linear-gradient(to right, #002395 0 33.33%, #fff 33.33% 66.67%, #ed2939 66.67%);
+}
+
+.version-germany {
+  background: linear-gradient(to bottom, #171717 0 33.33%, #d00 33.33% 66.67%, #ffce00 66.67%);
+}
+
+.version-spain {
+  background: linear-gradient(to bottom, #aa151b 0 25%, #f1bf00 25% 75%, #aa151b 75%);
+}
+
+.version-italy {
+  background: linear-gradient(to right, #009246 0 33.33%, #fff 33.33% 66.67%, #ce2b37 66.67%);
+}
+
+.version-brazil {
   background: #168944;
 }
 

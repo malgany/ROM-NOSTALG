@@ -108,7 +108,7 @@ O workflow de produção exige HTTPS, mas o frontend aceita HTTP em `localhost` 
 
 ## Catálogo criptografado
 
-A biblioteca mostra uma linha por jogo. **®** indica a versão original disponível no acervo e a bandeira do Brasil indica português; esses símbolos não certificam a procedência do dump. Ao lado de **Jogar selecionado**, escolha **Original** ou **Traduzido**. A opção indisponível fica desabilitada, e a versão traduzida usa o botão verde-amarelo. Cada versão mantém seu próprio ID e seus saves; hacks como **Super Mario World Hack 2025** ficam separados do jogo base.
+A biblioteca mostra uma linha por jogo. A versão **Original** usa uma bandeira inferida pelas marcações de idioma/região no nome do arquivo: inglês usa Estados Unidos, japonês usa Japão, e francês, alemão, espanhol e italiano usam seus respectivos países. Marcações de tradução têm prioridade sobre a região de lançamento; edições europeias sem idioma específico e arquivos sem indicação reconhecida usam Estados Unidos como padrão. Isso não confirma o idioma de todo o conteúdo nem a procedência do dump. A bandeira do Brasil continua indicando a versão em português. Ao lado de **Jogar selecionado**, escolha **Original** ou **Traduzido**. A opção indisponível fica desabilitada, e a versão traduzida usa o botão verde-amarelo. Cada versão mantém seu próprio ID e seus saves; hacks como **Super Mario World Hack 2025** ficam separados do jogo base.
 
 O gerador usa PBKDF2-SHA-256 com 600.000 iterações e AES-256-GCM. Os nomes ficam dentro do manifesto criptografado, cada ROM recebe um nome aleatório e é descriptografada apenas na memória do navegador. Os catálogos são separados por sistema em `site/vault/<sistema>`; atualmente somente `site/vault/snes` é consumido pelo site.
 

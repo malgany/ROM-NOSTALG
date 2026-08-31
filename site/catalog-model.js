@@ -39,5 +39,50 @@
     return group?.variants[preference] || group?.variants["pt-BR"] || group?.variants.original || null;
   }
 
-  return Object.freeze({ groupGames, selectedVersion });
+  function originalFlag(game) {
+    // Read release tags, never guess a language from the game's name or developer.
+    const source = game.fileName || game.storageTitle || game.title || "";
+    const tags = [...source.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase().matchAll(/\(([^()]*)\)|\[([^\[\]]*)\]/g)]
+      .map((match) => (match[1] || match[2]).trim());
+    const languages = {
+      en: "usa", eng: "usa", english: "usa", ingles: "usa",
+      ja: "japan", jp: "japan", jpn: "japan", japanese: "japan", japones: "japan",
+      fr: "france", fre: "france", french: "france", frances: "france",
+      de: "germany", ger: "germany", german: "germany", alemao: "germany",
+      es: "spain", spa: "spain", spanish: "spain", espanhol: "spain",
+      it: "italy", ita: "italy", italian: "italy", italiano: "italy",
+    };
+    const languageFlag = (token) => Object.hasOwn(languages, token) ? languages[token] : null;
+
+    // Translation tags such as [En by ...] and [T+Eng1.0] override the release region.
+    for (const tag of tags) {
+      const translation = tag.match(/^t[+-]([a-z]+)(?=$|\d|\s)/)
+        || tag.match(/^([a-z]+)(?=\d|\s+v?\d|\s+by\b)/);
+      const flag = translation && languageFlag(translation[1]);
+      if (flag) return flag;
+    }
+    const explicitLanguages = tags.flatMap((tag) => {
+      const flags = tag.split(",").map((token) => languageFlag(token.trim()));
+      return flags.every(Boolean) ? flags : [];
+    });
+    if (explicitLanguages.length) {
+      return explicitLanguages.includes("usa") ? "usa" : explicitLanguages[0];
+    }
+
+    const regions = tags.flatMap((tag) => tag.split(",").map((token) => token.trim()));
+    for (const [flag, pattern] of [
+      ["usa", /^(?:u|us|usa|uk|e|eu|eur|europe|w|world|usa & europe)$/],
+      ["japan", /^(?:j|jp|jpn|japan)$/],
+      ["france", /^(?:f|france)$/],
+      ["germany", /^(?:g|germany)$/],
+      ["spain", /^(?:s|spain)$/],
+      ["italy", /^(?:i|italy)$/],
+    ]) {
+      if (regions.some((region) => pattern.test(region))) return flag;
+    }
+    return "usa";
+  }
+
+  return Object.freeze({ groupGames, selectedVersion, originalFlag });
 });
