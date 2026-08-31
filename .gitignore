@@ -1,0 +1,41 @@
+# ROMs e saves nunca devem ser publicados por engano.
+/Top-100-snes/
+*.sfc
+*.smc
+*.fig
+*.swc
+*.bs
+*.st
+*.gb
+*.gbc
+*.dmg
+*.gba
+*.zip
+*.7z
+*.rar
+*.sav
+*.srm
+*.rtc
+*.state
+
+# Artefatos temporários do gerador.
+.catalog-build/
+
+# Dependências, estado local e resultados de teste.
+node_modules/
+worker/.wrangler/
+worker/.dev.vars*
+worker/.env*
+!worker/.dev.vars.example
+!worker/.env.example
+coverage/
+test-results/
+playwright-report/
+
+# Gerado pelo workflow do GitHub Pages ou pela configuração local.
+site/netplay-config.js
+
+# Arquivos locais de sistema/editor.
+.DS_Store
+Thumbs.db
+.vscode/

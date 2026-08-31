@@ -1,0 +1,5 @@
+# Official always-pass Turnstile test secret. Never use it in production.
+TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
+# Configure these with `wrangler secret put NAME` in production.
+TURN_KEY_ID="replace-with-turn-key-id"
+TURN_KEY_API_TOKEN="replace-with-turn-key-api-token"

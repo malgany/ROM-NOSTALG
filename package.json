@@ -1,0 +1,14 @@
+{
+  "name": "rom-nostalg",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:catalog": "node --test tools/build-catalog.test.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "ws": "^8.21.3"
+  }
+}

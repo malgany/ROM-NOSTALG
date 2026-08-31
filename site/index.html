@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0912">
+    <meta
+      name="description"
+      content="Jogue suas ROMs de Super Nintendo localmente no navegador. Nenhum arquivo é enviado."
+    >
+    <title>ROM Nostalg — Super Nintendo no navegador</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css?v=20260831-variants-1">
+    <link rel="stylesheet" href="./vendor/emulatorjs/4.2.3/snes-touch.css">
+    <link rel="stylesheet" href="./guest-ui.css?v=20260831-4">
+    <script src="./netplay-config.js" defer></script>
+    <script src="./netplay-core.js?v=20260831-2" defer></script>
+    <script src="./control-profiles.js?v=20260831-5" defer></script>
+    <script src="./host-control-profiles.js?v=20260831-5" defer></script>
+    <script src="./catalog-model.js?v=20260831-1" defer></script>
+    <script src="./app.js?v=20260831-variants-1" defer></script>
+    <script src="./vendor/emulatorjs/4.2.3/snes-touch.js" defer></script>
+    <script src="./guest-touch.js?v=20260831-4" defer></script>
+    <script src="./guest-ui.js?v=20260831-6" defer></script>
+    <script src="./netplay.js?v=20260831-6" defer></script>
+  </head>
+
+  <body>
+    <main class="app-shell">
+      <section id="picker-view" class="picker-view" aria-labelledby="page-title">
+        <header class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <span>ROM NOSTALG</span>
+        </header>
+
+        <div class="catalog-entry-card" aria-labelledby="page-title">
+          <div class="entry-icon lock-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="5" y="10" width="14" height="11" rx="2" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+            </svg>
+          </div>
+          <strong id="page-title">Catálogo de jogos</strong>
+          <span>Entre com sua senha para escolher um jogo da coleção.</span>
+          <button id="unlock-catalog-button" class="primary-button" type="button" aria-haspopup="dialog">
+            Desbloquear catálogo
+          </button>
+          <small>Seu último acesso pode ser lembrado neste navegador.</small>
+        </div>
+
+        <div
+          id="drop-zone"
+          class="drop-zone"
+          role="group"
+          aria-labelledby="drop-title"
+          aria-describedby="drop-help"
+        >
+          <input
+            id="rom-input"
+            type="file"
+            accept=".sfc,.smc,.fig,.swc,.zip,.7z,.rar"
+            hidden
+          >
+
+          <div class="drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
+            </svg>
+          </div>
+          <strong id="drop-title">Solte sua ROM aqui</strong>
+          <span id="drop-help">ou selecione um arquivo do computador</span>
+          <button id="pick-button" class="primary-button" type="button">Escolher ROM</button>
+          <small>.sfc, .smc, .fig, .swc, .zip, .7z ou .rar</small>
+        </div>
+
+        <p id="file-error" class="file-error" role="alert" aria-live="assertive"></p>
+
+        <div class="status-row">
+          <p class="gamepad-state">
+            <span class="status-dot" data-gamepad-dot></span>
+            <span data-gamepad-status>Nenhum controle detectado</span>
+          </p>
+        </div>
+      </section>
+
+      <section id="player-view" class="player-view" aria-labelledby="game-title" hidden>
+        <header class="player-header">
+          <div class="game-heading">
+            <span class="live-dot" aria-hidden="true"></span>
+            <div>
+              <p>Jogando agora</p>
+              <h1 id="game-title">ROM selecionada</h1>
+            </div>
+          </div>
+
+          <div class="player-actions">
+            <p class="gamepad-state compact">
+              <span class="status-dot" data-gamepad-dot></span>
+              <span data-gamepad-status>Nenhum controle detectado</span>
+            </p>
+            <button id="home-button" class="icon-button" type="button" aria-label="Sair do jogo e voltar ao catálogo">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 6 4 12l6 6M4 12h16" />
+              </svg>
+              <span>Trocar jogo</span>
+            </button>
+            <button id="multiplayer-button" class="icon-button multiplayer-button" type="button" hidden disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="9" cy="8" r="3" />
+                <circle cx="17" cy="10" r="2" />
+                <path d="M3.5 19c.5-3.4 2.4-5 5.5-5s5 1.6 5.5 5M14 15c2.9-.7 5.1.7 5.7 3.5" />
+              </svg>
+              <span>Multiplayer</span>
+            </button>
+            <button id="fullscreen-button" class="icon-button" type="button" aria-label="Entrar em tela cheia">
+              <svg class="enter-fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 3H3v5M16 3h5v5M8 21H3v-5m13 5h5v-5" />
+              </svg>
+              <svg class="exit-fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 8h5V3m13 5h-5V3M3 16h5v5m13-5h-5v5" />
+              </svg>
+              <span>Tela cheia</span>
+            </button>
+          </div>
+        </header>
+
+        <div id="game-stage" class="game-stage">
+          <div id="game" aria-label="Emulador de Super Nintendo"></div>
+          <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
+            <span class="loader" aria-hidden="true"></span>
+            <strong>Preparando o console…</strong>
+            <span>A ROM continua apenas neste dispositivo.</span>
+          </div>
+
+          <div id="progress-menu" class="progress-popover" role="menu" aria-label="Transferir progresso" hidden>
+            <button type="button" role="menuitem" data-progress-action="export-state">
+              <span>Exportar estado</span>
+              <small>.state</small>
+            </button>
+            <button type="button" role="menuitem" data-progress-action="import-state">
+              <span>Importar estado</span>
+              <small>.state</small>
+            </button>
+            <div class="progress-popover-separator" aria-hidden="true"></div>
+            <button type="button" role="menuitem" data-progress-action="export-save">
+              <span>Exportar save do jogo</span>
+              <small>.srm</small>
+            </button>
+            <button type="button" role="menuitem" data-progress-action="import-save">
+              <span>Importar save do jogo</span>
+              <small>.srm / .sav</small>
+            </button>
+            <p id="progress-status" class="progress-popover-status" role="status" aria-live="polite"></p>
+            <input id="state-import-input" type="file" accept=".state,application/octet-stream" hidden>
+            <input id="save-import-input" type="file" accept=".srm,.sav,.save,application/octet-stream" hidden>
+          </div>
+        </div>
+
+        <footer class="player-help">
+          <p><kbd>F11</kbd> tela cheia <span aria-hidden="true">·</span> <kbd>Esc</kbd> sair</p>
+          <p>Conecte um controle PlayStation, Xbox ou USB e pressione qualquer botão.</p>
+        </footer>
+      </section>
+
+      <section id="guest-view" class="guest-view" aria-labelledby="guest-title" hidden>
+        <header class="guest-header">
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <span>ROM NOSTALG</span>
+          </div>
+          <span class="guest-badge">Player 2</span>
+        </header>
+
+        <div class="guest-card">
+          <div class="guest-copy">
+            <p class="modal-eyebrow">Convite multiplayer</p>
+            <h1 id="guest-title">Entre na partida</h1>
+            <p>O jogo roda no computador de quem enviou o convite. Este dispositivo recebe a transmissão e controla apenas o Player 2.</p>
+          </div>
+
+          <div id="guest-player-shell" class="guest-player-shell">
+          <div id="guest-stage" class="guest-stage is-waiting" tabindex="0" aria-label="Transmissão e controles do Player 2">
+            <video id="guest-video" autoplay playsinline aria-label="Transmissão do jogo"></video>
+            <div id="guest-placeholder" class="guest-placeholder">
+              <span class="guest-controller-icon" aria-hidden="true">P2</span>
+              <strong>Aguardando conexão</strong>
+              <span>Entre na sala para receber a transmissão.</span>
+              <div id="guest-actions" class="guest-actions">
+                <button id="guest-enter-button" class="primary-button" type="button">Entrar na sala</button>
+                <button id="guest-leave-button" class="text-button" type="button">Sair</button>
+              </div>
+            </div>
+            <button id="guest-resume-button" class="icon-button guest-resume-button" type="button" hidden>Ativar áudio</button>
+            <div id="guest-touch-controls" class="guest-touch-controls" role="group" aria-label="Controle por toque do Player 2" hidden></div>
+
+            <div id="guest-player-toolbar" class="guest-player-toolbar is-hidden" aria-label="Controles do Player 2" inert>
+              <button id="guest-controls-button" class="guest-tool-button" type="button" aria-label="Configurações do Controle">
+                <svg class="" aria-hidden="true"><use href="./assets/guest-menu-icons.svg#gamepad"></use></svg><span class="guest-tool-tip">Configurações do Controle</span>
+              </button>
+              <div class="guest-audio-control">
+                <button id="guest-audio-button" class="guest-tool-button" type="button" aria-label="Mudo" aria-pressed="false" disabled>
+                  <svg class="guest-audio-waves" aria-hidden="true"><use href="./assets/guest-menu-icons.svg#mute"></use></svg><svg class="guest-audio-muted" aria-hidden="true"><use href="./assets/guest-menu-icons.svg#unmute"></use></svg><span class="guest-tool-tip">Mudo</span>
+                </button>
+                <input id="guest-volume" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="Volume" disabled>
+              </div>
+              <button id="guest-fullscreen-button" class="guest-tool-button" type="button" aria-label="Tela cheia" aria-pressed="false" disabled>
+                <svg class="guest-enter-fullscreen" aria-hidden="true"><use href="./assets/guest-menu-icons.svg#enterFullscreen"></use></svg><svg class="guest-exit-fullscreen" aria-hidden="true"><use href="./assets/guest-menu-icons.svg#exitFullscreen"></use></svg><span class="guest-tool-tip">Tela cheia</span>
+              </button>
+            </div>
+            <dialog id="guest-controls-dialog" class="guest-controls-dialog" aria-labelledby="guest-controls-title">
+              <h2 id="guest-controls-title">Configurações do Controle</h2>
+              <div class="guest-bindings-scroll">
+                <div class="guest-controller-slot">Player 2</div>
+                <label class="guest-gamepad-section" for="guest-connected-gamepad">Controle conectado:
+                  <select id="guest-connected-gamepad"><option value="none">Not Connected</option></select>
+                </label>
+                <table class="guest-bindings-table">
+                  <thead><tr><th scope="col"><span class="sr-only">Comando</span></th><th scope="col">Controle</th><th scope="col">Teclado</th><th scope="col"><span class="sr-only">Configurar</span></th></tr></thead>
+                  <tbody id="guest-bindings-body"></tbody>
+                </table>
+              </div>
+              <div class="guest-controls-dialog-actions">
+                <button id="guest-controls-reset" type="button">Resetar</button>
+                <button id="guest-controls-clear" type="button">Limpar</button>
+                <button id="guest-controls-close" type="button">Fechar</button>
+              </div>
+              <div id="guest-binding-capture" class="guest-binding-capture" hidden>
+                <div class="guest-binding-prompt" role="group" aria-label="Definir comando">
+                  <p id="guest-binding-prompt" role="status"></p>
+                  <button id="guest-binding-clear" type="button">Limpar</button>
+                  <button id="guest-binding-cancel" type="button">Cancelar</button>
+                </div>
+              </div>
+            </dialog>
+          </div>
+          <div id="guest-mobile-actions" class="guest-mobile-actions" hidden>
+            <button id="guest-mobile-fullscreen-button" class="icon-button" type="button" aria-label="Entrar em tela cheia" aria-pressed="false" disabled>
+              <svg class="guest-enter-fullscreen" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5m13 5h5v-5" /></svg>
+              <svg class="guest-exit-fullscreen" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h5V3m13 5h-5V3M3 16h5v5m13-5h-5v5" /></svg>
+              <span>Tela cheia</span>
+            </button>
+          </div>
+          </div>
+
+          <div class="guest-session-bar">
+            <p class="netplay-state" role="status" aria-live="polite">
+              <span class="status-dot" id="guest-status-dot"></span>
+              <span id="guest-status">Pronto para entrar</span>
+            </p>
+            <p id="guest-control-state" class="guest-control-state">Teclado ou controle USB</p>
+          </div>
+
+          <div id="guest-session-actions"></div>
+
+          <p id="guest-touch-help" class="guest-controls-help" hidden>Use o controle na tela para jogar. Você pode segurar a direção e os botões ao mesmo tempo e girar o celular.</p>
+          <footer id="guest-player-help" class="player-help guest-player-help">
+            <p><kbd>F11</kbd> tela cheia <span aria-hidden="true">·</span> <kbd>Esc</kbd> sair</p>
+            <p>Conecte um controle PlayStation, Xbox ou USB e pressione qualquer botão.</p>
+          </footer>
+        </div>
+      </section>
+
+    </main>
+
+    <dialog id="unlock-dialog" class="modal-shell" aria-labelledby="unlock-title">
+      <div class="modal-card unlock-card">
+        <button class="modal-close" type="button" data-close-unlock aria-label="Fechar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+        </button>
+
+        <div class="modal-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+        </div>
+        <p class="modal-eyebrow">Área reservada</p>
+        <h2 id="unlock-title">Desbloquear catálogo</h2>
+        <p class="modal-copy">
+          A senha libera os nomes e os jogos apenas na memória desta aba. Ela não é enviada para nenhum servidor.
+        </p>
+
+        <form id="unlock-form" novalidate>
+          <label for="catalog-password">Senha do catálogo</label>
+          <div class="password-field">
+            <input
+              id="catalog-password"
+              type="password"
+              minlength="16"
+              autocomplete="current-password"
+              spellcheck="false"
+              required
+            >
+            <button id="toggle-password" type="button" aria-label="Mostrar senha">Mostrar</button>
+          </div>
+          <label class="remember-option" for="remember-password">
+            <input id="remember-password" type="checkbox">
+            <span class="remember-check" aria-hidden="true">
+              <svg viewBox="0 0 16 16"><path d="m3.5 8 3 3 6-6" /></svg>
+            </span>
+            <span>Lembrar senha neste navegador</span>
+          </label>
+          <p id="unlock-status" class="modal-status" role="status" aria-live="polite"></p>
+          <button id="unlock-submit" class="primary-button modal-primary" type="submit">
+            Abrir catálogo
+          </button>
+        </form>
+      </div>
+    </dialog>
+
+    <dialog id="catalog-dialog" class="modal-shell catalog-shell" aria-labelledby="catalog-title">
+      <div class="modal-card catalog-card">
+        <header class="catalog-header">
+          <div>
+            <p class="modal-eyebrow">Biblioteca desbloqueada</p>
+            <h2 id="catalog-title">Escolha um jogo</h2>
+          </div>
+          <button class="modal-close catalog-close" type="button" data-close-catalog aria-label="Fechar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+          </button>
+        </header>
+
+        <div class="catalog-tools">
+          <label class="search-field" for="catalog-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16 16 4 4" /></svg>
+            <input id="catalog-search" type="search" placeholder="Buscar jogo" aria-label="Buscar jogo" autocomplete="off">
+          </label>
+          <span id="catalog-count" class="catalog-count"></span>
+        </div>
+
+        <nav id="catalog-letters" class="catalog-letters" aria-label="Filtrar por letra"></nav>
+        <div id="catalog-list" class="catalog-list" role="radiogroup" aria-label="Jogos disponíveis"></div>
+
+        <footer class="catalog-footer">
+          <p id="catalog-selection">Nenhum jogo selecionado</p>
+          <div class="catalog-footer-actions">
+            <p id="catalog-status" class="modal-status" role="status" aria-live="polite"></p>
+            <fieldset class="catalog-variant-toggle">
+              <legend class="visually-hidden">Versão do jogo</legend>
+              <label><input type="radio" name="catalog-variant" value="original" disabled><span>Original</span></label>
+              <label><input type="radio" name="catalog-variant" value="pt-BR" disabled><span>Traduzido</span></label>
+            </fieldset>
+            <button id="play-catalog-game" class="primary-button modal-primary" type="button" disabled>
+              Jogar selecionado
+            </button>
+          </div>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog id="multiplayer-dialog" class="modal-shell" aria-labelledby="multiplayer-title">
+      <div class="modal-card multiplayer-card">
+        <button class="modal-close" type="button" data-close-multiplayer aria-label="Fechar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+        </button>
+
+        <div class="modal-icon multiplayer-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="9" cy="8" r="3" />
+            <circle cx="17" cy="10" r="2" />
+            <path d="M3.5 19c.5-3.4 2.4-5 5.5-5s5 1.6 5.5 5M14 15c2.9-.7 5.1.7 5.7 3.5" />
+          </svg>
+        </div>
+        <p class="modal-eyebrow">Host multiplayer</p>
+        <h2 id="multiplayer-title">Convide o Player 2</h2>
+        <p class="modal-copy">
+          A outra pessoa recebe áudio e vídeo por uma conexão WebRTC e não baixa sua ROM nem acessa o catálogo.
+        </p>
+
+        <div id="multiplayer-create-panel">
+          <div id="turnstile-container" class="turnstile-container" aria-label="Verificação de segurança"></div>
+          <p id="multiplayer-status" class="modal-status" role="status" aria-live="polite"></p>
+          <button id="create-room-button" class="primary-button modal-primary" type="button" disabled>
+            Criar sala
+          </button>
+        </div>
+
+        <div id="multiplayer-room-panel" class="multiplayer-room-panel" hidden>
+          <p class="netplay-state">
+            <span class="status-dot" id="host-status-dot"></span>
+            <span id="host-status">Preparando a sala…</span>
+          </p>
+          <label for="invite-link">Link secreto do convidado</label>
+          <div class="invite-field">
+            <input id="invite-link" type="text" readonly spellcheck="false">
+            <button id="copy-invite-button" class="icon-button" type="button">Copiar</button>
+          </div>
+          <small id="room-expiration"></small>
+          <p id="host-session-error" class="modal-status" role="alert" aria-live="assertive"></p>
+          <button id="end-room-button" class="danger-button" type="button">Encerrar sala</button>
+        </div>
+      </div>
+    </dialog>
+
+    <noscript>Ative o JavaScript para carregar o emulador.</noscript>
+  </body>
+</html>
