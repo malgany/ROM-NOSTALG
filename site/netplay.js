@@ -1137,13 +1137,19 @@
         const turnstile = await loadTurnstile();
         if (!turnstile) throw new Error("A verificação do Cloudflare não ficou disponível.");
 
+        const theme = document.documentElement.dataset.theme || "dark";
+        if (this.turnstileWidget !== null && this.turnstileTheme !== theme) {
+          turnstile.remove(this.turnstileWidget);
+          this.turnstileWidget = null;
+        }
+        this.turnstileTheme = theme;
         if (this.turnstileWidget !== null) {
           turnstile.reset(this.turnstileWidget);
         } else {
           this.turnstileWidget = turnstile.render("#turnstile-container", {
             sitekey: config.turnstileSiteKey,
             action: "create-room",
-            theme: "dark",
+            theme,
             callback: (token) => {
               this.turnstileToken = token;
               this.createRoomButton.disabled = false;

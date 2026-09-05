@@ -46,7 +46,8 @@ test("menu desktop segue o host e configura apenas o controle do convidado", asy
     await guest.screenshot({ path: testInfo.outputPath("desktop-footer.png") });
     await guest.locator("#guest-controls-button").hover();
     await expect(guest.locator("#guest-controls-button .guest-tool-tip")).toHaveCSS("opacity", "1");
-    await expect(guest.locator("#guest-controls-button")).toHaveCSS("background-color", "rgb(169, 137, 255)");
+    const accent = await guest.locator('.modal-eyebrow').first().evaluate((label) => getComputedStyle(label).color);
+    await expect(guest.locator("#guest-controls-button")).toHaveCSS("background-color", accent);
     const stage = await guest.locator("#guest-stage").boundingBox();
     await guest.mouse.move(stage.x + 20, stage.y + 20);
     await guest.waitForTimeout(2100);

@@ -34,8 +34,10 @@ function fixture() {
     cipher: { name: 'AES-GCM', iv: iv.toString('base64') }, payload: sealed.toString('base64') } };
 }
 
+for (const theme of ['light', 'dark']) {
 for (const viewport of [{ width: 1100, height: 800 }, { width: 390, height: 844 }]) {
-  test(`catálogo alterna versões reais e mantém hacks separados em ${viewport.width}px`, async ({ page }, testInfo) => {
+  test(`catálogo alterna versões reais e mantém hacks separados em ${viewport.width}px / ${theme}`, async ({ page }, testInfo) => {
+    await page.emulateMedia({ colorScheme: theme });
     await page.setViewportSize(viewport);
     const { assets, envelope } = fixture();
     await page.route('**/vault/snes/catalog.json', (route) => route.fulfill({ json: envelope }));
@@ -108,4 +110,5 @@ for (const viewport of [{ width: 1100, height: 800 }, { width: 390, height: 844 
     await expect(page.locator('.catalog-game')).toHaveCount(2);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
+}
 }

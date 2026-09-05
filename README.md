@@ -4,6 +4,13 @@ Emulador de Super Nintendo para o navegador, publicado no GitHub Pages. O jogado
 
 ## Usar
 
+O botão **Claro / Escuro** no cabeçalho alterna a aparência de todo o site,
+incluindo catálogo, modais e menus do emulador e do convidado. No primeiro
+acesso, o tema acompanha o sistema; após uma escolha, a preferência fica salva
+em `rom-nostalg.theme.v1` e sincroniza entre abas. Se o navegador bloquear o
+armazenamento, a escolha vale durante a sessão. Jogos, controles e saves
+continuam com o mesmo funcionamento.
+
 1. Abra o site.
 2. Clique em **Escolher ROM** ou arraste uma ROM para a área indicada.
 3. Use uma ROM `.sfc`, `.smc`, `.fig` ou `.swc`; arquivos `.zip`, `.7z` e `.rar` também são aceitos.

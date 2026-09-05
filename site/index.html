@@ -3,16 +3,18 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#0b0912">
+    <meta name="theme-color" content="#16151b">
     <meta
       name="description"
       content="Jogue suas ROMs de Super Nintendo localmente no navegador. Nenhum arquivo é enviado."
     >
     <title>ROM Nostalg — Super Nintendo no navegador</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./styles.css?v=20260831-flags-1">
+    <script src="./theme.js?v=20260905-1"></script>
+    <link rel="stylesheet" href="./styles.css?v=20260905-1">
     <link rel="stylesheet" href="./vendor/emulatorjs/4.2.3/snes-touch.css">
-    <link rel="stylesheet" href="./guest-ui.css?v=20260831-4">
+    <link rel="stylesheet" href="./guest-ui.css?v=20260905-1">
+    <link rel="stylesheet" href="./emulator-theme.css?v=20260905-1">
     <script src="./netplay-config.js" defer></script>
     <script src="./netplay-core.js?v=20260831-2" defer></script>
     <script src="./control-profiles.js?v=20260831-5" defer></script>
@@ -22,27 +24,59 @@
     <script src="./vendor/emulatorjs/4.2.3/snes-touch.js" defer></script>
     <script src="./guest-touch.js?v=20260831-4" defer></script>
     <script src="./guest-ui.js?v=20260831-6" defer></script>
-    <script src="./netplay.js?v=20260831-6" defer></script>
+    <script src="./netplay.js?v=20260905-1" defer></script>
   </head>
 
   <body>
     <main class="app-shell">
-      <section id="picker-view" class="picker-view" aria-labelledby="page-title">
-        <header class="brand">
+      <header class="site-header">
+        <div class="brand">
           <div class="brand-mark" aria-hidden="true">
             <span></span><span></span><span></span><span></span>
           </div>
-          <span>ROM NOSTALG</span>
+          <span>ROM <b>NOSTALG</b></span>
+        </div>
+        <button id="theme-toggle" class="icon-button theme-toggle" type="button" aria-label="Tema escuro" aria-pressed="true">
+          <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+          <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg>
+          <span id="theme-label">Escuro</span>
+        </button>
+      </header>
+
+      <section id="picker-view" class="picker-view" aria-labelledby="page-title">
+        <header class="picker-intro">
+          <div>
+            <p class="modal-eyebrow">Super Nintendo · direto no navegador</p>
+            <h1 id="page-title">Bons jogos.<br><span>Boas memórias.</span></h1>
+            <p class="intro-copy">Seu próximo momento de nostalgia começa aqui.<br>Abra a coleção ou traga sua própria ROM.</p>
+          </div>
+          <svg class="console-art" viewBox="0 0 380 250" fill="none" aria-hidden="true">
+            <ellipse cx="195" cy="215" rx="145" ry="12" fill="currentColor" opacity=".06"/>
+            <path d="M189 63V42c0-25 57-4 57-29" stroke="var(--border-strong)" stroke-width="6" stroke-linecap="round"/>
+            <g transform="rotate(-9 190 135)">
+              <path d="M103 67h174c37 0 66 31 66 70s-25 64-59 64c-25 0-40-13-56-30h-77c-16 17-31 30-55 30-35 0-60-25-60-64s30-70 67-70Z" fill="var(--surface-raised)" stroke="var(--border-strong)" stroke-width="2"/>
+              <path d="M96 74h182" stroke="var(--border)" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="105" cy="132" r="47" fill="var(--background)" stroke="var(--border)"/>
+              <path d="M95 103h20v19h19v20h-19v19H95v-19H76v-20h19Z" fill="var(--muted)"/>
+              <circle cx="105" cy="132" r="8" fill="var(--surface-raised)"/>
+              <rect x="239" y="91" width="77" height="84" rx="38" fill="var(--background)" stroke="var(--border)"/>
+              <circle cx="279" cy="109" r="13" fill="#5988d9"/><circle cx="302" cy="133" r="13" fill="#db6374"/>
+              <circle cx="255" cy="133" r="13" fill="#4d9b78"/><circle cx="279" cy="157" r="13" fill="#d7ae49"/>
+              <path d="m163 140 12-9m17 9 12-9" stroke="var(--muted)" stroke-width="9" stroke-linecap="round"/>
+              <path d="M158 109h48" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+            </g>
+          </svg>
         </header>
 
-        <div class="catalog-entry-card" aria-labelledby="page-title">
+        <div class="catalog-entry-card" aria-labelledby="catalog-entry-title">
           <div class="entry-icon lock-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <rect x="5" y="10" width="14" height="11" rx="2" />
               <path d="M8 10V7a4 4 0 0 1 8 0v3" />
             </svg>
           </div>
-          <strong id="page-title">Catálogo de jogos</strong>
+          <span class="entry-kicker">01 / Sua coleção</span>
+          <strong id="catalog-entry-title">Catálogo de jogos</strong>
           <span>Entre com sua senha para escolher um jogo da coleção.</span>
           <button id="unlock-catalog-button" class="primary-button" type="button" aria-haspopup="dialog">
             Desbloquear catálogo
@@ -69,15 +103,17 @@
               <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
             </svg>
           </div>
+          <span class="entry-kicker">02 / Seu arquivo</span>
           <strong id="drop-title">Solte sua ROM aqui</strong>
           <span id="drop-help">ou selecione um arquivo do computador</span>
-          <button id="pick-button" class="primary-button" type="button">Escolher ROM</button>
+          <button id="pick-button" class="primary-button secondary-button" type="button">Escolher ROM</button>
           <small>.sfc, .smc, .fig, .swc, .zip, .7z ou .rar</small>
         </div>
 
         <p id="file-error" class="file-error" role="alert" aria-live="assertive"></p>
 
         <div class="status-row">
+          <p class="privacy-note">Seus jogos ficam no seu dispositivo.</p>
           <p class="gamepad-state">
             <span class="status-dot" data-gamepad-dot></span>
             <span data-gamepad-status>Nenhum controle detectado</span>
@@ -166,12 +202,7 @@
 
       <section id="guest-view" class="guest-view" aria-labelledby="guest-title" hidden>
         <header class="guest-header">
-          <div class="brand">
-            <div class="brand-mark" aria-hidden="true">
-              <span></span><span></span><span></span><span></span>
-            </div>
-            <span>ROM NOSTALG</span>
-          </div>
+          <p class="modal-eyebrow">Jogue junto, de onde estiver</p>
           <span class="guest-badge">Player 2</span>
         </header>
 
