@@ -1,0 +1,124 @@
+/* Presentation bridge for the pinned EmulatorJS 4.2.3 and guest UI.
+   ID scoping wins over the stylesheet injected by the emulator at runtime.
+   !important only overrides upstream inline colors / important declarations.
+   Video, canvas and touch geometry remain controlled by the original player. */
+#game .ejs_parent { --ejs-primary-color: var(--emulator-accent-rgb) !important; }
+:root { --emulator-accent-rgb: 187, 165, 245; }
+:root[data-theme="light"] { --emulator-accent-rgb: 105, 69, 164; }
+#game .ejs_parent, #game .ejs_parent *, .guest-controls-dialog, .guest-tool-button { font-family: var(--font); }
+
+#game .ejs_popup_container,
+.guest-controls-dialog {
+  color-scheme: var(--scheme);
+  color: var(--text);
+  background: var(--surface-solid);
+}
+#game .ejs_popup_container *, #game .ejs_popup_container h4,
+#game .ejs_control_player_bar li, #game .ejs_control_player_bar a,
+#game .ejs_control_body, .guest-controls-dialog h2 { color: var(--text) !important; }
+#game .ejs_popup_container h4, .guest-controls-dialog h2 { font-size: 20px; font-weight: 700; letter-spacing: -.025em; }
+
+#game .ejs_settings_parent, #game .ejs_context_menu,
+#game .ejs_popup_box, .guest-binding-prompt {
+  color: var(--text);
+  background: var(--surface-solid) !important;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+#game .ejs_popup_container_box, .guest-binding-capture { background: var(--scrim); }
+#game .ejs_settings_parent::before { border-top-color: var(--border); }
+#game .ejs_settings_parent::after { border-top-color: var(--surface-solid); }
+#game .ejs_settings_main_bar, #game .ejs_back_button,
+#game .ejs_button_style, #game .ejs_context_menu a,
+#game .ejs_context_menu ul { color: var(--text); border-radius: 6px; }
+#game .ejs_settings_main_bar:hover, #game .ejs_back_button:hover,
+#game .ejs_button_style:hover, #game .ejs_context_menu li:hover { background: var(--accent-soft); color: var(--text); box-shadow: none; }
+#game .ejs_back_button::before { background: var(--border); box-shadow: none; }
+#game .ejs_option_row::before { background: var(--input); border: 1px solid var(--border-strong); }
+#game .ejs_option_row_selected::before { background: var(--accent); border-color: var(--accent); }
+#game .ejs_option_row::after { background: var(--on-accent); }
+
+#game .ejs_menu_bar, .guest-player-toolbar {
+  color: var(--text);
+  background: var(--surface-solid);
+  border-top: 1px solid var(--border);
+}
+#game .ejs_menu_button, .guest-tool-button { border-radius: 8px; }
+#game .ejs_menu_button:hover, #game .ejs_menu_button:focus-visible,
+.guest-tool-button:hover, .guest-tool-button:focus-visible {
+  color: var(--on-accent);
+  background: var(--accent);
+}
+#game .ejs_big_screen .ejs_menu_text, .guest-tool-tip {
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+#game .ejs_big_screen .ejs_menu_text::before, .guest-tool-tip::before { border-top-color: var(--surface-raised); }
+#game .ejs_small_screen .ejs_menu_text { color: inherit; }
+#game .ejs_volume_parent input[type="range"], .guest-audio-control input[type="range"] {
+  color: var(--accent);
+  background: var(--border-strong);
+}
+
+#game .ejs_control_body input[type="text"], #game .ejs_gamepad_dropdown,
+.guest-bindings-table input, #guest-connected-gamepad {
+  color-scheme: var(--scheme);
+  color: var(--text) !important;
+  background: var(--input);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-family: var(--font);
+}
+.guest-bindings-table input { height: 30px; }
+#game .ejs_gamepad_dropdown:hover, #game .ejs_gamepad_dropdown:focus,
+#guest-connected-gamepad:hover, #guest-connected-gamepad:focus-visible {
+  background: var(--input);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+#game .ejs_control_selected, .guest-controller-slot { color: var(--on-accent); background: var(--accent); border: 0; border-radius: 6px; }
+#game .ejs_control_selected a { color: var(--on-accent) !important; }
+.guest-controller-slot { margin: 4px 0 10px; padding: 4px 12px; }
+.guest-gamepad-section { gap: 8px; margin-bottom: 14px; }
+#game .ejs_control_bar:hover, #game .ejs_control_player_bar li:hover:not(.ejs_control_selected),
+.guest-bindings-table tbody tr:hover { background: var(--surface-raised); }
+.guest-bindings-table thead th { color: var(--muted); padding-bottom: 12px; }
+.guest-bindings-scroll { scrollbar-color: var(--border-strong) var(--surface-solid); }
+.guest-bindings-scroll::-webkit-scrollbar-track { background: var(--surface-solid); }
+.guest-bindings-scroll::-webkit-scrollbar-thumb { background: var(--border-strong); }
+
+#game .ejs_button, #game .ejs_control_set_button, #game .ejs_button_button,
+.guest-bindings-table button, .guest-binding-prompt button, .guest-controls-dialog-actions button {
+  color: var(--on-accent) !important;
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  font-family: var(--font);
+  font-weight: 650;
+}
+#game .ejs_button *, #game .ejs_control_set_button * { color: inherit !important; }
+#game .ejs_button:hover, #game .ejs_control_set_button:hover, #game .ejs_button_button:hover,
+.guest-controls-dialog button:hover { background: var(--accent-hover); filter: none; }
+.guest-bindings-table button, .guest-binding-prompt button { min-height: 30px; }
+.guest-controls-dialog-actions button { min-height: 40px; }
+#game .ejs_cheat_row label::before { background: var(--input); border-color: var(--border-strong); }
+#game .ejs_cheat_row input:checked + label::before { background: var(--accent); border-color: var(--accent); }
+#game .ejs_cheat_row label::after { background: var(--muted); }
+#game .ejs_cheat_row input:checked + label::after { background: var(--on-accent); }
+#game .ejs_parent :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Touch controls remain legible over any game frame in either theme. */
+.guest-player-shell:fullscreen, .guest-player-shell:-webkit-full-screen { background: var(--surface-solid); }
+
+@media (max-width: 600px) {
+  .guest-stage:has(.guest-controls-dialog[open]) { min-height: min(560px, 90svh); }
+  .guest-controls-dialog h2 { font-size: 17px; line-height: 1.3; }
+  .guest-controls-dialog-actions { gap: 8px; padding: 10px 8px; }
+  .guest-controls-dialog-actions button { min-width: 0; padding-inline: 10px; font-size: 12px; }
+  .guest-gamepad-section { flex-wrap: wrap; gap: 6px; }
+  .guest-bindings-table th, .guest-bindings-table td { padding-inline: 3px; }
+  .guest-bindings-table button { padding-inline: 5px; font-size: 12px; }
+}

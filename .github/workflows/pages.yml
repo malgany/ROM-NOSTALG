@@ -1,0 +1,128 @@
+name: Publicar ROM Nostalg no GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - site/**
+      - tests/e2e/**
+      - package.json
+      - package-lock.json
+      - playwright.config.cjs
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Testar frontend e multiplayer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v6
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar JavaScript e controles
+        run: |
+          node --check site/app.js
+          node --check site/netplay-core.js
+          node --check site/netplay.js
+          node --check site/guest-ui.js
+          node --test site/tests/*.test.cjs
+          npm run test:catalog
+
+      - name: Instalar Chromium do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Testar duas sessões WebRTC
+        run: npm run test:e2e
+
+  deploy:
+    name: Publicar GitHub Pages
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    env:
+      NETPLAY_API_URL: ${{ vars.NETPLAY_API_URL }}
+      TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v6
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Gerar configuração pública do multiplayer
+        shell: bash
+        run: |
+          node --input-type=module <<'EOF'
+          import { writeFileSync } from "node:fs";
+
+          const apiUrlValue = process.env.NETPLAY_API_URL?.trim();
+          const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY?.trim();
+
+          if (!apiUrlValue) {
+            throw new Error("Defina a variável NETPLAY_API_URL no repositório.");
+          }
+
+          if (!turnstileSiteKey) {
+            throw new Error("Defina a variável TURNSTILE_SITE_KEY no repositório.");
+          }
+
+          const apiUrl = new URL(apiUrlValue);
+          if (apiUrl.protocol !== "https:") {
+            throw new Error("NETPLAY_API_URL precisa usar HTTPS.");
+          }
+
+          if (apiUrl.username || apiUrl.password || apiUrl.search || apiUrl.hash) {
+            throw new Error("NETPLAY_API_URL não pode conter credenciais, query string ou fragmento.");
+          }
+
+          const config = {
+            apiUrl: apiUrl.toString().replace(/\/$/, ""),
+            turnstileSiteKey,
+          };
+
+          writeFileSync(
+            "site/netplay-config.js",
+            `window.ROM_NOSTALG_NETPLAY_CONFIG = Object.freeze(${JSON.stringify(config)});\n`,
+            "utf8",
+          );
+          EOF
+
+          node --check site/netplay-config.js
+
+      - name: Preparar arquivos do site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./site
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
